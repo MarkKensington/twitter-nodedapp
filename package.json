@@ -1,0 +1,30 @@
+{
+  "name": "twitter-nodedapp",
+  "version": "1.0.0",
+  "description": "Ethereum DApp using NodeJS to listen for Tweets & interact with Smart Contract",
+  "main": "twitterNodeDapp.js",
+  "scripts": {
+    "test": "truffle test",
+    "coverage": "solidity-coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MarkKensington/twitter-nodedapp.git"
+  },
+  "author": "Mark Kensington",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MarkKensington/twitter-nodedapp/issues"
+  },
+  "homepage": "https://github.com/MarkKensington/twitter-nodedapp#readme",
+  "dependencies": {
+    "dotenv": "^8.0.0",
+    "ethereumjs-tx": "^2.1.0",
+    "truffle-hdwallet-provider": "^1.0.14",
+    "twitter": "^1.7.1",
+    "web3": "^1.2.0"
+  },
+  "devDependencies": {
+    "solidity-coverage": "^0.6.3"
+  }
+}
