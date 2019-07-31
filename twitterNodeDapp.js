@@ -3,12 +3,13 @@
  * Twitter Node DApp Listener
  * @author: Mark Kensington
  * Listens to a Twitter Stream for a specific message with an Ethereum Address &
- * when heard it processes a smart contract transaction to send tokens to that address
+ * when heard it processes a smart contract transaction to send ERC20 tokens to that address
  */
 
 // Set-up Environment Variables for DApp credentials and default values
 const Dotenv = require("dotenv");
-Dotenv.config();
+const dotenvConfig = Dotenv.config();
+if (dotenvConfig.error) console.log(dotenvConfig.error);
 
 // Set-up access to Twitter
 const Twitter = require("twitter");
@@ -19,10 +20,17 @@ const client = new Twitter ({
   access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 });
 
-// Set-up ethereumjs-tx and web3
-const EthereumTx = require('ethereumjs-tx').Transaction;
+// Set-up web3
 const Web3 = require("web3");
-const web3 = new Web3(new Web3.providers.HttpProvider(process.env.WEB3_HTTP_PROVIDER));
+const net = require("net");  // Only needed if using IPC
+const web3 = (process.env.WEB3_IPC_CONNECTION == "IPC") ?
+  new Web3(new Web3.providers.IpcProvider(process.env.WEB3_IPC_PATH, net)) :
+  new Web3(new Web3.providers.HttpProvider(process.env.WEB3_HTTP_PROVIDER));
+
+// Set-up ethereumjs tools
+const EthereumCommon = require("ethereumjs-common").default;
+const ethereumCommon = EthereumCommon.forCustomChain("mainnet", {chainId: parseInt(process.env.TND_CHAIN_ID)},"petersburg",);
+const EthereumTx = require('ethereumjs-tx').Transaction;
 
 // Load Smart Contract ABI from JSON file
 const fs = require("fs");
@@ -39,11 +47,9 @@ const contractInstance = new web3.eth.Contract(contractABI, process.env.TND_CONT
 
 // Check Smart Contract is deployed and then runStreamer
 web3.eth.getCode(process.env.TND_CONTRACT_ADDRESS, (error, result) => {
-  if (error) {
-    console.error("Error: ", error);
-  }
+  if (error) console.log(error);
   if (result == "0x") {
-    console.log("ERROR - Looks like your Smart Contract is not deployed!");
+    console.log("Error: Looks like your Smart Contract is not deployed!");
   } else {
     console.log(`Smart Contract deployed at address: ${process.env.TND_CONTRACT_ADDRESS}.`);
     runStreamer();
@@ -65,7 +71,7 @@ function runStreamer() {
     if (web3.utils.isAddress(tweetAddress)) {
       processTweetToken(tweetAddress);
     } else {
-      console.log(`-ERROR - Tweet Address is not a valid Ethereum Address!\n`);
+      console.log(`-Error: Tweet Address is not a valid Ethereum Address!\n`);
     }
   });
 
@@ -76,23 +82,23 @@ function runStreamer() {
 
 function processTweetToken(receiverAddress) {
   web3.eth.getTransactionCount(process.env.TND_ADMIN_ACCOUNT, (error, transactionCount) => {
-    if (error) console.error(`-ERROR: ${error}\n`);
+    if (error) console.log(`-Error: ${error}\n`);
     let basicTransaction = {
-      "nonce": web3.utils.toHex(transactionCount),
-      "gas": web3.utils.toHex(process.env.TND_CONTRACT_GAS),
-      "gasPrice": web3.utils.toHex(web3.utils.toWei(process.env.TND_CONTRACT_GAS_PRICE, "gwei")),
-      "from": process.env.TND_ADMIN_ACCOUNT,
-      "to": process.env.TND_CONTRACT_ADDRESS,
-      "data": contractInstance.methods.tweetToken(receiverAddress).encodeABI()
+      nonce: web3.utils.toHex(transactionCount),
+      chainID: web3.utils.toHex(process.env.TND_CHAIN_ID),
+      gas: web3.utils.toHex(process.env.TND_CONTRACT_GAS),
+      gasPrice: web3.utils.toHex(web3.utils.toWei(process.env.TND_CONTRACT_GAS_PRICE, "gwei")),
+      from: process.env.TND_ADMIN_ACCOUNT,
+      to: process.env.TND_CONTRACT_ADDRESS,
+      data: contractInstance.methods.tweetToken(receiverAddress).encodeABI()
     };
-    let signedTransaction = new EthereumTx(basicTransaction);
+    let signedTransaction = new EthereumTx(basicTransaction, {common: ethereumCommon});
     signedTransaction.sign(adminPrivateKey);
     let serializedTransaction = signedTransaction.serialize();
     let rawTransaction = "0x" + serializedTransaction.toString("hex");
     web3.eth.sendSignedTransaction(rawTransaction, (error, transactionHash) => {
-      if (error) console.error(`-ERROR: ${error}\n`);
+      if (error) console.log(`-Error: ${error}\n`);
       console.log(`-Transaction #: ${transactionHash}\n`);
     });
   });
 }
-

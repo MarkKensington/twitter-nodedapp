@@ -75,7 +75,7 @@ coverage.json
 .changelog
 .DS_Store
 
+# local working files
+_localFiles
+
 # specific files for this project
-twitterCredentials.js
-smartContractCredentials.js
-_toSort
