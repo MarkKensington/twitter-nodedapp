@@ -18,13 +18,18 @@
  *
  */
 
+// Set-up Environment Variables for DApp credentials and default values
+const Dotenv = require("dotenv");
+const dotenvConfig = Dotenv.config();
+if (dotenvConfig.error) console.log(dotenvConfig.error);
+
 const HDWalletProvider = require("truffle-hdwallet-provider");
 // const infuraKey = "fj4jll3k.....";
 //
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
-let privateKey = "<your private key here>";
-let rinkebyEndpoint = "https://rinkeby.infura.io/v3/<YOUR-PROJECT-ID>";
+let privateKey = process.env.TND_ADMIN_PRIVATE_KEY;
+let rinkebyEndpoint = process.env.WEB3_HTTP_PROVIDER;
 
 module.exports = {
   /**
@@ -102,13 +107,13 @@ module.exports = {
     solc: {
       // version: "0.5.1",    // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
-      // settings: {          // See the solidity docs for advice about optimization and evmVersion
-      //  optimizer: {
-      //    enabled: false,
-      //    runs: 200
-      //  },
+      settings: {          // See the solidity docs for advice about optimization and evmVersion
+        optimizer: {
+          enabled: true,
+          runs: 200
+        },
       //  evmVersion: "byzantium"
-      // }
+      }
     }
   }
 };

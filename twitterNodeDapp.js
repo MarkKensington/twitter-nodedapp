@@ -31,6 +31,7 @@ const web3 = (process.env.WEB3_IPC_CONNECTION == "IPC") ?
 const EthereumCommon = require("ethereumjs-common").default;
 const ethereumCommon = EthereumCommon.forCustomChain("mainnet", {chainId: parseInt(process.env.TND_CHAIN_ID)},"petersburg",);
 const EthereumTx = require('ethereumjs-tx').Transaction;
+const adminPrivateKey = Buffer.from(process.env.TND_ADMIN_PRIVATE_KEY, "hex",);
 
 // Load Smart Contract ABI from JSON file
 const fs = require("fs");
@@ -38,7 +39,6 @@ const jsonFile = "./twitterNodeDapp_abi.json";
 const contractABI = JSON.parse(fs.readFileSync(jsonFile));
 
 // Set-up & initialise the Smart Contract
-const adminPrivateKey = Buffer.from(process.env.TND_ADMIN_PRIVATE_KEY, "hex",);
 const contractInstance = new web3.eth.Contract(contractABI, process.env.TND_CONTRACT_ADDRESS, {
   from: process.env.TND_ADMIN_ACCOUNT,
   gasPrice: "20000000000"  // default gas price in wei
