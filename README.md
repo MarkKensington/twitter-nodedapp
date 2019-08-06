@@ -66,10 +66,7 @@ To deploy using Truffle then a `.env` file will need to be created/updated (see 
 
 2. From a terminal window, start the app using `node twitterNodeDapp.js`. This should start the listener. Now, when a user sends a tweet in the format `#giveMeTNDTokens` followed by their own Ethereum Address, the app will issue a Smart Contract transaction which will transfer 10 tokens (unless changed) to their address
 
-## ToDo
-- Sort _localFiles
-
 ## Future Ideas
-- Add in a Max Supply??
+- Add in a Max Supply
 - Add in a Self-Destruct
 - Look at adding in a Proxy
