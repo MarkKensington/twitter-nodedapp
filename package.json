@@ -26,6 +26,6 @@
     "web3": "^1.2.11"
   },
   "devDependencies": {
-    "solidity-coverage": "^0.7.9"
+    "solidity-coverage": "^0.7.16"
   }
 }
