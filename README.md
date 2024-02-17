@@ -1,6 +1,10 @@
 # twitter-nodedapp
 Ethereum DApp using node.js to listen for Twitter tweets and interact with a smart contract to send tokens to the tweeted Ethereum address.
 
+
+## TODO Run NPM UPDATE to fix security advisories on glob-parent >=5.1.2, normalize-url >=4.5.1, tar >=4.4.15
+
+
 #### Status: Working, with a smart contract deployed on the Rinkeby test network
 
 ## Prerequisites
